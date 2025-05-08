@@ -32,6 +32,23 @@ export const bodyRegisterValidator = [
   body('email', 'Formato de email incorrecto')
     .isEmail()
     .normalizeEmail(),
+  body('phone', 'Formato de celular incorrecto').trim().notEmpty().escape()
+    .custom(
+      async (value) => {
+        const regex = /\+54 9 \d{2,4} \d{2,4}-\d{4}/
+        const result = value.match(regex)
+        if (!result) throw new Error('Formato de celular incorrecto')
+      }
+    ),
+  body('name', 'El nombre no puede estar vacio').trim().notEmpty().escape(),
+  body('role', 'Formato de Rol incorrecto').trim().notEmpty().escape()
+    .custom(
+      async (value) => {
+        if (!mongoose.isValidObjectId(value)) {
+          throw new Error('Formato de Rol incorrecto')
+        }
+      }
+    ),
   body('password', 'Formato de password imcorrecto')
     .trim()
     .isLength({ min: 6 }),

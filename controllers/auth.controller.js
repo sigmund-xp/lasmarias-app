@@ -3,12 +3,12 @@ import { generateRefreshToken, generateToken, tokenVerificationErrors } from '..
 
 export const register = async (req, res) => {
   console.log('Register')
-  const { email, password } = req.body
+  const { email, name, phone, password, role } = req.body
   try {
     let user = await User.findOne({ email })
     if (user) return res.status(403).json({ error: 'El usuario ya existe' })
 
-    user = new User({ email, password })
+    user = new User({ email, name, phone, password, role })
     await user.save()
 
     const { token, expiresIn } = generateToken(user.id)
@@ -46,12 +46,21 @@ export const login = async (req, res) => {
   }
 }
 
-export const infoUser = async (req, res) => {
+export const setUserRole = async (req, res) => {
   try {
-    const user = await User.findById(req.uid).lean()
-    return res.json({ uid: user._id, email: user.email })
+    const { id } = req.params
+    const { role } = req.body
+
+    console.log(id)
+    console.log(role)
+
+    const user = await User.findByIdAndUpdate(id, { role })
+    if (!user) return res.status(404).json({ error: 'No existe el Usuario' })
+
+    return res.json({ user })
   } catch (error) {
-    return res.status(400).json({ error: 'Credenciales incorrectas' })
+    console.log(error)
+    return res.status(500).json({ error: 'Error del servidor' })
   }
 }
 
