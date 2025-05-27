@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken'
 import { User } from '../models/User.js'
 import { generateRefreshToken, generateToken, tokenVerificationErrors } from '../utils/tokenManager.js'
 
@@ -28,13 +29,13 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email })
     if (!user) {
       console.log(`No existe el usuario [${email}]`)
-      return res.status(400).json({ error: 'Credenciales incorrectas' })
+      return res.status(400).json({ error: 'No pudimos iniciar sesión. Verificá tus datos e intentá nuevamente.' })
     }
 
     const isValidPass = await user.comparePassword(password)
     if (!isValidPass) {
       console.log('Contraseña invalida')
-      return res.status(400).json({ error: 'Credenciales incorrectas' })
+      return res.status(400).json({ error: 'No pudimos iniciar sesión. Verificá tus datos e intentá nuevamente.' })
     }
 
     const { token, expiresIn } = generateToken(user.id)
@@ -42,7 +43,7 @@ export const login = async (req, res) => {
 
     return res.json({ token, expiresIn })
   } catch (error) {
-    return res.status(400).json({ error: 'Credenciales incorrectas' })
+    return res.status(400).json({ error: 'No pudimos iniciar sesión. Verificá tus datos e intentá nuevamente.' })
   }
 }
 
@@ -50,9 +51,6 @@ export const setUserRole = async (req, res) => {
   try {
     const { id } = req.params
     const { role } = req.body
-
-    console.log(id)
-    console.log(role)
 
     const user = await User.findByIdAndUpdate(id, { role })
     if (!user) return res.status(404).json({ error: 'No existe el Usuario' })
@@ -73,11 +71,21 @@ export const refreshToken = (req, res) => {
   }
 }
 
+export const verify = async (req, res) => {
+  const { token } = req.params
+  try {
+    const { uid } = jwt.verify(token, process.env.SECRET_JWT_REFRESH_KEY)
+    const user = await User.findById(uid)
+    if (!user) return res.status(404).json({ error: 'El usuario no existe' })
+
+    return res.json({ user })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: error.message })
+  }
+}
+
 export const logout = (req, res) => {
   res.clearCookie('refreshToken')
   return res.json({ ok: true })
-}
-
-export const test = (req, res) => {
-  return res.json({ test: 'OK' })
 }

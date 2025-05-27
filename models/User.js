@@ -1,30 +1,26 @@
 import mongoose from 'mongoose'
 import bcryptjs from 'bcryptjs'
+import { ExtraUserData } from './ExtraUserData.js'
+import { Role } from './Role.js'
+
+const { Types } = mongoose
 
 const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    index: { unique: true }
-  },
-  phone: {
-    type: String,
-    required: true
-  },
-  name: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String
-  },
-  password: {
-    type: String,
-    required: true
-  }
+  email: { type: String, required: true, unique: true, lowercase: true, index: { unique: true } },
+  phone: { type: String, required: false },
+  name: { type: String, required: true },
+  role: { type: Types.ObjectId, required: true, ref: 'Roles' },
+  extraData: { type: Types.ObjectId, ref: 'ExtraUserData' },
+  password: { type: String, required: false },
+  changePassword: { type: Boolean, default: false },
+  blocked: { type: Boolean, default: false }
 })
+
+const getRoleName = async (roleId) => {
+  const role = await Role.findById(roleId)
+  if (!role) return ''
+  return role.description.toUpper()
+}
 
 userSchema.pre('save', async function (next) {
   const user = this
@@ -40,8 +36,39 @@ userSchema.pre('save', async function (next) {
   }
 })
 
+userSchema.methods.getExtraData = async function () {
+  const extraData = await ExtraUserData.findById(this.extraData)
+  return extraData
+}
+
 userSchema.methods.comparePassword = async function (candidatePass) {
   return await bcryptjs.compare(candidatePass, this.password)
+}
+
+userSchema.methods.isAdmin = async function () {
+  return (getRoleName(this.rol).startsWith('Admini'))
+}
+
+userSchema.methods.isSysAdmin = async function () {
+  return (getRoleName(this.rol).startsWith('AdminS'))
+}
+
+userSchema.methods.isOwner = async function () {
+  return (getRoleName(this.rol).startsWith('P'))
+}
+
+userSchema.methods.isVeterinarian = async function () {
+  return (getRoleName(this.rol).startsWith('V'))
+}
+
+userSchema.methods.isRider = async function () {
+  return (getRoleName(this.rol).startsWith('Amazon'))
+}
+
+userSchema.methods.getPermissions = async function () {
+  const role = await Role.findById(this.rol)
+  if (!role) return ''
+  return role.permissions
 }
 
 export const User = mongoose.model('Usuarios', userSchema, 'Usuarios')

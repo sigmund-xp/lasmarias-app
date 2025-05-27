@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Las Marías</title>
+  <style>
+    :root {
+      --black: #000;
+      --dark: #111;
+      --gold: #d4af37;
+      --gold-light: #e5c766;
+      --white: #fff;
+      --gray: #bbb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--black);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .login-container {
+      background-color: var(--dark);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 100%;
+      margin: 0 auto 2rem;
+    }
+
+    label {
+      color: var(--white);
+      display: block;
+      margin-bottom: 0.5rem;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      background-color: #222;
+      color: var(--white);
+      font-size: 1rem;
+    }
+
+    input::placeholder {
+      color: var(--gray);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-login {
+      background-color: var(--gold);
+      color: var(--black);
+      margin-bottom: 0.8rem;
+    }
+
+    .btn-login:hover {
+      background-color: var(--gold-light);
+    }
+
+    .btn-register {
+      background-color: transparent;
+      color: var(--gold);
+      border: 2px solid var(--gold);
+    }
+
+    .btn-register:hover {
+      background-color: var(--gold);
+      color: var(--black);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 1rem;
+      color: #777;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <img src="/images/logo-lm.jpg" alt="Logo Las Marías" class="logo" />
+    <form>
+      <label for="email">Correo electrónico</label>
+      <input type="email" id="email" placeholder="usuario@ejemplo.com" autocomplete="off" required />
+
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" placeholder="********" autocomplete="off" required />
+
+      <button type="submit" class="btn btn-login">Entrar</button>
+      <button type="button" class="btn btn-register" onclick="window.location.href='register.html'">
+        Registrarse
+      </button>
+    </form>
+    <div class="footer">© 2025 Las Marías</div>
+  </div>
+</body>
+<script>
+  document.querySelector('form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const response = await fetch('http://localhost:3000/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en la autenticación');
+      }
+
+      const data = await response.json();
+      window.location.href = '/dashboard.html';
+    } catch (error) {
+      alert('Error: ' + error.message);
+    }
+  });
+</script>
+</html>

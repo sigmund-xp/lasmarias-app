@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | Las Marías</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.7rem;
+      padding-left: 1.5rem;
+      padding-bottom: 0.7rem;
+      padding-right: 2rem;
+      border-bottom: 2px solid #C5A044;
+    }
+
+    header img {
+      height: 60px;
+    }
+
+    header .username {
+      font-size: 1.2rem;
+      color: #C5A044;
+      text-align: left;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      color: #C5A044;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      padding-left: 1.5rem;
+    }
+    .username {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .user-role {
+      font-style: italic;
+      font-size: 0.85rem;
+      color: #C5A044;
+    }
+
+    .menu-toggle {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #C5A044;
+      display: block;
+    }
+
+    .sidebar {
+      background-color: #111;
+      width: 220px;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      border-left: 2px solid #C5A044;
+      position: fixed;
+      right: 0;
+      top: 70px;
+      height: calc(100% - 70px);
+      transition: transform 0.3s ease-in-out;
+      transform: translateX(100%);
+    }
+
+    .sidebar a {
+      color: #C5A044;
+      text-decoration: none;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .sidebar a i {
+      font-size: 1.2rem;
+      display: inline-block;
+    }
+
+    .content {
+      margin-left: 0;
+      margin-top: 70px;
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+
+    .horse-card {
+      background-color: #111;
+      border: 1px solid #C5A044;
+      border-radius: 10px;
+      overflow: hidden;
+      width: 220px;
+      text-align: center;
+      color: white;
+      transition: transform 0.2s;
+    }
+
+    .horse-card:hover {
+      transform: scale(1.03);
+    }
+
+    .horse-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .horse-card p {
+      margin: 0.8rem 0;
+      font-size: 1.1rem;
+      color: #C5A044;
+    }
+
+    .sidebar {
+      transform: translateX(100%);
+      width: 200px;
+      top: 0;
+      z-index: 999;
+    }
+
+    .sidebar.active {
+      transform: translateX(0);
+    }
+
+    .filters {
+      padding-top: 0.5rem;
+      padding-left: 2rem;
+      padding-bottom: 1rem;
+      padding-right: 2rem;
+      background-color: #111; 
+      border-bottom: 1px solid #C5A044; 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 1.5rem; 
+      align-items: flex-start;
+    }
+
+    .filters .blockFilter {
+      display: flex; 
+      flex-direction: column; 
+      flex: 1 1 200px;
+    }
+
+    .filters input {
+      padding: 0.5rem 1rem; 
+      border-radius: 5px; 
+      border: 1px solid #C5A044; 
+      background-color: #000; 
+      color: #fff;
+    }
+
+    .filters label {
+      color: #C5A044; 
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      .content {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <img src="/images/logo-lm-header.jpg" alt="Logo Las Marías" />
+      <div class="user-info">
+        <div class="username">Juan Pérez</div>
+        <div class="user-role">Propietario</div>
+      </div>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  </header>
+
+  <div class="filters">
+    <div class='blockFilter'>
+      <label for="searchInput">Nombre del caballo</label>
+      <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="filterHorses()" />
+    </div>
+    <div class='blockFilter'>
+      <label for="ownerFilter">Propietario</label>
+      <input type="text" id="ownerFilter" placeholder="Buscar propietario..." onkeyup="filterHorses()" />
+    </div>
+  </div>
+<div class="filters" style="padding: 1rem 2rem; background-color: #111; border-bottom: 1px solid #C5A044; display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end;">
+  <div style="display: flex; flex-direction: column; flex: 1 1 200px;">
+    <label for="searchInput" style="color: #C5A044; margin-bottom: 0.3rem;">Nombre del caballo</label>
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Buscar..." 
+      style="padding: 0.5rem 1rem; border-radius: 5px; border: 1px solid #C5A044; background-color: #000; color: #fff;"
+    />
+  </div>
+
+  <div style="display: flex; flex-direction: column; flex: 1 1 200px;">
+    <label for="ownerFilter" style="color: #C5A044; margin-bottom: 0.3rem;">Propietario</label>
+    <input 
+      type="text" 
+      id="ownerFilter" 
+      placeholder="Buscar propietario..." 
+      style="padding: 0.5rem 1rem; border-radius: 5px; border: 1px solid #C5A044; background-color: #000; color: #fff;"
+    />
+  </div>
+
+  <div style="display: flex; flex-direction: column;">
+    <label style="visibility: hidden;">Buscar</label>
+    <button 
+      onclick="filterHorses()" 
+      style="padding: 0.5rem 1rem; border-radius: 5px; border: 1px solid #C5A044; background-color: #C5A044; color: #000; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="fas fa-search"></i> Buscar
+    </button>
+  </div>
+</div>
+
+
+  <aside class="sidebar" id="sidebar">
+    <a href="javascript:void(0);" onclick="closeMenu()"><i class="fas fa-user"></i> Mi perfil</a>
+    <a href="javascript:void(0);" onclick="closeMenu()"><i class="fas fa-horse-head"></i> Agregar caballo</a>
+    <a href="javascript:void(0);" onclick="closeMenu()"><i class="fas fa-stethoscope"></i> Incorporar veterinario</a>
+    <a href="javascript:void(0);" onclick="logout()"><i class="fas fa-right-from-bracket"></i> Cerrar sesión</a>
+  </aside>
+
+
+  <main class="content">
+    <div class="horse-card">
+      <img src="/images/c1.jpeg" alt="Caballo 1">
+      <p>Relincho</p>
+    </div>
+    <div class="horse-card">
+      <img src="/images/c2.jpeg" alt="Caballo 2">
+      <p>Estrella</p>
+    </div>
+    <div class="horse-card">
+      <img src="/images/c3.jpeg" alt="Caballo 3">
+      <p>Morito</p>
+    </div>
+  </main>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+    function closeMenu() {
+      document.getElementById("sidebar").classList.remove("active");
+    }
+    async function logout() {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/auth/refresh', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al insertar');
+        }
+
+        const data = await response.json();
+        console.log(data);
+        
+        const resLogout = await fetch('http://localhost:3000/api/v1/auth/logout', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${data.token}`
+          }
+        });
+
+        if (!resLogout.ok) {
+          throw new Error('Error al insertar');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+      window.location.href = '/index.html';
+    }
+    function filterHorses() {
+      const nameInput = document.getElementById("searchInput").value.toLowerCase();
+      const ownerInput = document.getElementById("ownerFilter").value.toLowerCase();
+
+      const cards = document.querySelectorAll(".horse-card");
+
+      cards.forEach(card => {
+        const name = card.querySelector("p").textContent.toLowerCase();
+        const ownerAttr = (card.getAttribute("data-owner") || "").toLowerCase();
+
+        const matchName = name.includes(nameInput);
+        const matchOwner = ownerAttr.includes(ownerInput);
+
+        card.style.display = (matchName && matchOwner) ? "block" : "none";
+      });
+    }
+  </script>
+</body>
+</html>

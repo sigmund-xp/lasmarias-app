@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calendario | Las Marías</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
+  <script src="http://localhost:3000/fullcalendar-6.1.17/packages/core/locales/es.global.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Merriweather', serif;
+      background-color: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 2rem;
+      border-bottom: 2px solid #C5A044;
+    }
+    header img {
+      height: 60px;
+    }
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      color: #C5A044;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      padding-left: 1.5rem;
+    }
+    .username {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .user-role {
+      font-style: italic;
+      font-size: 0.85rem;
+      color: #C5A044;
+    }
+    .menu-toggle {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #C5A044;
+    }
+    .filters {
+      padding: 1rem 2rem;
+      background-color: #111;
+      border-bottom: 1px solid #C5A044;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-end;
+    }
+    .filters label {
+      color: #C5A044;
+      margin-bottom: 0.3rem;
+    }
+    .filters input {
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      border: 1px solid #C5A044;
+      background-color: #000;
+      color: #fff;
+    }
+    .filters button {
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      border: 1px solid #C5A044;
+      background-color: #C5A044;
+      color: #000;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .content {
+      margin-top: 1rem;
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+    .horse-card {
+      background-color: #111;
+      border: 1px solid #C5A044;
+      border-radius: 10px;
+      overflow: hidden;
+      width: 220px;
+      text-align: center;
+      color: white;
+      transition: transform 0.2s;
+    }
+    .horse-card:hover {
+      transform: scale(1.03);
+    }
+    .horse-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+    .horse-card p {
+      margin: 0.8rem 0;
+      font-size: 1.1rem;
+      color: #C5A044;
+    }
+    #calendar {
+      background-color: #111;
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid #C5A044;
+    }
+    .fc {
+      background-color: #111;
+      color: #fff;
+      border: none;
+    }
+    .fc .fc-scrollgrid {
+      border-color: #c5a044;
+    }
+    .fc-toolbar-title {
+      color: #C5A044;
+      font-size: 1.2rem;
+    }
+    .fc-button {
+      background-color: #C5A044 !important;
+      border: none !important;
+      color: #000 !important;
+      font-weight: bold;
+    }
+    .fc-daygrid-event {
+      background-color: #C5A044 !important;
+      color: #000 !important;
+      border: none !important;
+    }
+    .fc-theme-standard td, 
+    .fc-theme-standard th {
+      border-color: #c5a044;
+    }
+    .fc-col-header-cell {
+      background-color: #C5A044;
+      border-color: #000 !important;
+      color: #000 !important;
+    }
+    .fc-event {
+      font-size: 0.75rem !important;
+      line-height: 1.2 !important;
+      padding: 2px 4px;
+      white-space: normal !important;
+      background-color: #C5A044 !important;
+      color: #000 !important;
+      border: none !important;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <img src="/images/logo-lm-header.jpg" alt="Logo Las Marías" />
+      <div class="user-info">
+        <div class="username">Juan Pérez</div>
+        <div class="user-role">Propietario</div>
+      </div>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  </header>
+
+  <div style="padding: 2rem;">
+    <h2 style="color: #C5A044; font-size: 1.5rem; margin-bottom: 1rem;">Agenda de clases</h2>
+    <div id="calendar"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridWeek',
+        dayHeaderFormat: { weekday: 'long' },
+        titleFormat: function(date) {
+          const startDay = `${date.start.day}/${date.start.month}/${date.start.year}`;
+          const endDay = `${date.end.day}/${date.end.month}/${date.end.year}`;
+          return `${startDay} al ${endDay}`;
+        },
+        locale: 'es',
+        height: 'auto',
+        eventClick: function(info) {
+          alert('Event: ' + info.event.title);
+          alert('View: ' + info.view.type);
+          console.log(info);
+        },
+        headerToolbar: {
+          start: 'prev,next today',
+          center: 'title',
+          end: ''
+        },
+        events: [
+          {
+            title: '10:00 - Martina López\nProf: José',
+            start: '2025-05-14T10:00:00'
+          },
+          {
+            title: '10:00 - Tomás Díaz\nProf: Ariel',
+            start: '2025-05-14T10:00:00'
+          },
+          {
+            title: '09:30 - Grupo Avanzado\nProf: Belén',
+            start: '2025-05-14T09:30:00'
+          }
+        ],
+        eventContent: function(arg) {
+          return {
+            html: '<div style="white-space: pre-line;">' + arg.event.title + '</div>'
+          };
+        }
+      });
+
+      calendar.render();
+    });
+  </script>
+</body>
+</html>
