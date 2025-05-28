@@ -74,11 +74,15 @@ export const refreshToken = (req, res) => {
 export const verify = async (req, res) => {
   const { token } = req.params
   try {
-    const { uid } = jwt.verify(token, process.env.SECRET_JWT_REFRESH_KEY)
+    const { uid } = jwt.verify(token, process.env.SECRET_JWT_EMAIL_KEY)
     const user = await User.findById(uid)
-    if (!user) return res.status(404).json({ error: 'El usuario no existe' })
+    if (!user) {
+      return res.status(404).json({ error: 'El usuario no existe' })
+    } else if (user.password) {
+      return res.status(403).json({ error: 'Token caducado' })
+    }
 
-    return res.json({ user })
+    return res.json({ uid, name: user.name, email: user.email })
   } catch (error) {
     console.log(error)
     return res.status(500).json({ error: error.message })

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import bcryptjs from 'bcryptjs'
 import { User } from '../models/User.js'
 import { Role } from '../models/Role.js'
 import { generateEmailToken } from '../utils/tokenManager.js'
@@ -41,7 +42,7 @@ export const createUser = async (req, res) => {
   try {
     const user = new User({ name, email, role: await getRoleId(kind), changePassword: true })
     await user.save()
-    await sendVerifyEmail(name, email, { token: await generateEmailToken({ name, email }) })
+    await sendVerifyEmail(name, email, { token: await generateEmailToken({ uid: user.id }) })
 
     return res.status(201).json({ id: user.id })
   } catch (error) {
@@ -51,6 +52,24 @@ export const createUser = async (req, res) => {
     }
     return res.status(500).json({ error: error.message })
   }
+}
+export const registerUser = async (req, res) => {
+  console.log('registerUser')
+  const { phone, password } = req.body
+
+  try {
+    const hashedPassword = await hashedPass(password)
+    await User.findByIdAndUpdate(req.uid, { phone, password: hashedPassword, changePassword: false }, { runValidators: true })
+    return res.status(201).json({ ok: true })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: error.message })
+  }
+}
+
+const hashedPass = async (password) => {
+  const salt = await bcryptjs.genSalt(10)
+  return await bcryptjs.hash(password, salt)
 }
 
 const getRoleId = async (kind) => {

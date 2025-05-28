@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { login, register, refreshToken, verify, logout } from '../controllers/auth.controller.js'
-import { requireRefreshToken } from '../middlewares/requireRefreshToken.js'
+import { requireRefreshToken } from '../middlewares/requireToken.js'
 import { bodyLoginValidator, bodyRegisterValidator, logBody } from '../middlewares/validatorManager.js'
 
 const router = Router()

@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 const eventoSchema = new mongoose.Schema({
   nombre: String,
   fecha_limite: Date,
+  tipo: String,
   estado: String, // ej: 'activo', 'vencido'
   correo: String,
   data: { type: Object, default: {} },
