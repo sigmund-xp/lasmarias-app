@@ -4,12 +4,12 @@ import { generateRefreshToken, generateToken, tokenVerificationErrors } from '..
 
 export const register = async (req, res) => {
   console.log('Register')
-  const { email, name, phone, password, role } = req.body
+  const { email, name, phoneArea, phoneNumber, password, role } = req.body
   try {
     let user = await User.findOne({ email })
     if (user) return res.status(403).json({ error: 'El usuario ya existe' })
 
-    user = new User({ email, name, phone, password, role })
+    user = new User({ email, name, phoneArea, phoneNumber, password, role })
     await user.save()
 
     const { token, expiresIn } = generateToken(user.id)
@@ -43,6 +43,7 @@ export const login = async (req, res) => {
 
     return res.json({ token, expiresIn })
   } catch (error) {
+    console.log(error)
     return res.status(400).json({ error: 'No pudimos iniciar sesión. Verificá tus datos e intentá nuevamente.' })
   }
 }

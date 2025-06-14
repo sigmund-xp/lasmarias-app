@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import bcryptjs from 'bcryptjs'
 import { User } from '../models/User.js'
+import { ExtraUserData } from '../models/ExtraUserData.js'
 import { Role } from '../models/Role.js'
 import { generateEmailToken } from '../utils/tokenManager.js'
 import { sendVerifyEmail } from '../controllers/event.controller.js'
@@ -10,7 +11,7 @@ export const getUserInfo = async (req, res) => {
   let token = req.headers?.authorization
   token = token.split(' ')[1]
   const { uid } = jwt.verify(token, process.env.SECRET_JWT_KEY)
-  const user = await User.findById(uid).select('name').populate({
+  const user = await User.findById(uid).select('email name phoneArea phoneNumber').populate({
     path: 'role',
     select: 'description permissions'
   }).populate('extraData')
@@ -18,7 +19,7 @@ export const getUserInfo = async (req, res) => {
   if (!user) {
     return res.status(500).json({ error: 'Error de credenciales' })
   } else {
-    return res.json({ userInfo: user })
+    return res.json({ userInfo: user.toJSON() })
   }
 }
 
@@ -42,6 +43,15 @@ export const createUser = async (req, res) => {
   try {
     const user = new User({ name, email, role: await getRoleId(kind), changePassword: true })
     await user.save()
+    const extraData = new ExtraUserData({
+      kind,
+      userId: user.id,
+      veteSpecialty: '',
+      address: { calle: '', numero: '', piso: '', dpto: '', codPostal: '', localidad: '', provincia: '' },
+      emergency: { name: '', phoneArea: '', phoneNumber: '' },
+      billingData: { cbu: '', alias: '', name: '' }
+    })
+    await extraData.save()
     await sendVerifyEmail(name, email, { token: await generateEmailToken({ uid: user.id }) })
 
     return res.status(201).json({ id: user.id })
@@ -53,13 +63,29 @@ export const createUser = async (req, res) => {
     return res.status(500).json({ error: error.message })
   }
 }
+
+export const updateProfileUser = async (req, res) => {
+  console.log('updateProfileUser')
+  const { email, name, phoneArea, phoneNumber, extraData } = req.body
+  try {
+    await User.findByIdAndUpdate(req.uid, { email, name, phoneArea, phoneNumber })
+    if (req.uKind !== 'A') {
+      await ExtraUserData.findByIdAndUpdate(extraData.id, { address: extraData.address, emergency: extraData.emergency, billingData: extraData.billingData })
+    }
+    return res.status(201).json({ ok: true })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: error.message })
+  }
+}
+
 export const registerUser = async (req, res) => {
   console.log('registerUser')
-  const { phone, password } = req.body
+  const { phoneArea, phoneNumber, password } = req.body
 
   try {
     const hashedPassword = await hashedPass(password)
-    await User.findByIdAndUpdate(req.uid, { phone, password: hashedPassword, changePassword: false }, { runValidators: true })
+    await User.findByIdAndUpdate(req.uid, { phoneArea, phoneNumber, password: hashedPassword, changePassword: false }, { runValidators: true })
     return res.status(201).json({ ok: true })
   } catch (error) {
     console.log(error)

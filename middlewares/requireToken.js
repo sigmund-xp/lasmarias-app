@@ -1,23 +1,37 @@
 import jwt from 'jsonwebtoken'
+import { User } from '../models/User.js'
 import { tokenVerificationErrors } from '../utils/tokenManager.js'
 
-export const requireToken = (req, res, next) => {
+export const requireToken = async (req, res, next) => {
   console.log('requireToken')
   try {
     let token = req.headers?.authorization
+    console.log(token)
     if (!token) {
-      console.log('No hay token')
-      console.log(req.headers)
       return res.status(401).json({ error: 'Error de sesion' })
     } else {
       token = token.split(' ')[1]
       const { uid } = jwt.verify(token, process.env.SECRET_JWT_KEY)
       req.uid = uid
+      const role = await getUserRole(uid)
+      req.uKind = role.description[0]
+      req.uPermissions = role.permissions
       next()
     }
   } catch (error) {
     console.log(error)
     return res.status(401).json({ error: tokenVerificationErrors(error) })
+  }
+}
+
+export const getUserRole = async (uid) => {
+  try {
+    const user = await User.findById(uid)
+      .populate('role', 'description permissions')
+    return user?.role || {}
+  } catch (error) {
+    console.error('Error getting user role:', error)
+    return {}
   }
 }
 

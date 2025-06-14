@@ -7,14 +7,24 @@ const { Types } = mongoose
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, index: { unique: true } },
-  phone: { type: String, required: false },
+  phoneArea: { type: String, required: false },
+  phoneNumber: { type: String, required: false },
   name: { type: String, required: true },
   role: { type: Types.ObjectId, required: true, ref: 'Roles' },
-  extraData: { type: Types.ObjectId, ref: 'ExtraUserData' },
   password: { type: String, required: false },
   changePassword: { type: Boolean, default: false },
   blocked: { type: Boolean, default: false }
 })
+
+userSchema.virtual('extraData', {
+  ref: 'ExtraUserData',
+  localField: '_id',
+  foreignField: 'userId',
+  justOne: true
+})
+
+userSchema.set('toObject', { virtuals: true })
+userSchema.set('toJSON', { virtuals: true })
 
 const getRoleName = async (roleId) => {
   const role = await Role.findById(roleId)

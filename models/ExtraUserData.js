@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+const { Types } = mongoose
 
 const billingDataSchema = new mongoose.Schema({
   cbu: { type: String },
@@ -7,23 +8,24 @@ const billingDataSchema = new mongoose.Schema({
 })
 
 const addressSchema = new mongoose.Schema({
-  calle: { type: String, required: true },
-  numero: { type: Number, required: true },
+  calle: { type: String },
+  numero: { type: Number },
   piso: { type: Number },
   dpto: { type: String },
-  codPostal: { type: String, required: true },
-  localidad: { type: String, required: true },
-  provincia: { type: String, required: true }
+  codPostal: { type: String },
+  localidad: { type: String },
+  provincia: { type: String }
 })
 
 const emergencySchema = new mongoose.Schema({
-  nombre: { type: String },
-  telefono: { type: String, required: true }
+  name: { type: String },
+  phoneArea: { type: String },
+  phoneNumber: { type: String }
 })
 
 const edoSchema = new mongoose.Schema({
   kind: { type: String, required: true },
-  userId: { type: String, required: true, unique: true },
+  userId: { type: Types.ObjectId, required: true, unique: true, ref: 'Usuarios' },
   veteSpecialty: { type: String },
   address: addressSchema,
   emergency: emergencySchema,

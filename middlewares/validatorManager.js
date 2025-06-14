@@ -31,12 +31,19 @@ export const paramObjectIdValidator = [
 
 export const bodyRegisterValidator = [
   body('email', 'Formato de email incorrecto')
-    .isEmail()
-    .normalizeEmail(),
-  body('phone', 'Formato de celular incorrecto').trim().notEmpty().escape()
+    .isEmail(),
+  body('phoneArea', 'Formato del código de área incorrecto').trim().notEmpty().escape()
     .custom(
       async (value) => {
-        const regex = /\+54 9 \(\d{2,4}\) \d{2,4}-\d{4}/
+        const regex = /\d{2,4}/
+        const result = value.match(regex)
+        if (!result) throw new Error('Formato del código de área incorrecto')
+      }
+    ),
+  body('phoneNumber', 'Formato de celular incorrecto').trim().notEmpty().escape()
+    .custom(
+      async (value) => {
+        const regex = /\d{2,4}-\d{4}/
         const result = value.match(regex)
         if (!result) throw new Error('Formato de celular incorrecto')
       }
@@ -58,7 +65,6 @@ export const bodyRegisterValidator = [
 
 export const bodyLoginValidator = [
   body('email', 'Formato de email incorrecto')
-    .isEmail()
-    .normalizeEmail(),
+    .isEmail(),
   validationResultExpress
 ]
