@@ -72,7 +72,7 @@ const getMailOptions = (evento) => {
   }
 }
 
-const makeUrlVerificacion = (token) => `${process.env.ORIGIN1}/api/v1/auth/verify/${token}`
+const makeUrlVerificacion = (token) => `${process.env.ORIGIN1}/verify/${token}`
 
 const getWelcomeEmailHtml = (nombre, urlVerificacion) => `
 <!DOCTYPE html>
