@@ -20,7 +20,7 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
-
+app.use(express.static('public'))
 app.use(express.json())
 app.use(cookieParser())
 app.use((req, res, next) => {
