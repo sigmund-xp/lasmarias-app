@@ -36,13 +36,17 @@ export const getUserRole = async (uid) => {
 }
 
 export const requireRefreshToken = (req, res, next) => {
+  console.log('requireRefreshToken')
   try {
+    console.log(req)
     const cookieToken = req.cookies.refreshToken
+    console.log(cookieToken)
     if (!cookieToken) throw new Error('Sesion expirada')
     const { uid } = jwt.verify(cookieToken, process.env.SECRET_JWT_REFRESH_KEY)
     req.uid = uid
     next()
   } catch (error) {
+    console.log(error)
     return res.status(401).json({ error: tokenVerificationErrors(error) })
   }
 }

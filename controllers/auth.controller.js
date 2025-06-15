@@ -65,8 +65,6 @@ export const setUserRole = async (req, res) => {
 
 export const refreshToken = (req, res) => {
   try {
-    console.log(JSON.stringify(req.body))
-    console.log(JSON.stringify(req.uid))
     const { token, expiresIn } = generateToken(req.uid)
     return res.json({ token, expiresIn })
   } catch (error) {
