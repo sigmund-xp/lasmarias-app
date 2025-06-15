@@ -49,6 +49,7 @@ export const login = async (req, res) => {
 }
 
 export const setUserRole = async (req, res) => {
+  console.log('setUserRole')
   try {
     const { id } = req.params
     const { role } = req.body
@@ -64,6 +65,7 @@ export const setUserRole = async (req, res) => {
 }
 
 export const refreshToken = (req, res) => {
+  console.log('refreshToken')
   try {
     const { token, expiresIn } = generateToken(req.uid)
     return res.json({ token, expiresIn })
@@ -74,6 +76,7 @@ export const refreshToken = (req, res) => {
 }
 
 export const verify = async (req, res) => {
+  console.log('verify')
   const { token } = req.params
   try {
     const { uid } = jwt.verify(token, process.env.SECRET_JWT_EMAIL_KEY)
@@ -92,6 +95,7 @@ export const verify = async (req, res) => {
 }
 
 export const logout = (req, res) => {
+  console.log('logout')
   res.clearCookie('refreshToken')
   return res.json({ ok: true })
 }
