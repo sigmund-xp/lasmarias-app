@@ -38,7 +38,7 @@ export const getUserRole = async (uid) => {
 export const requireRefreshToken = (req, res, next) => {
   console.log('requireRefreshToken')
   try {
-    console.log(req)
+    console.log(req.cookies)
     const cookieToken = req.cookies.refreshToken
     console.log(cookieToken)
     if (!cookieToken) throw new Error('Sesion expirada')

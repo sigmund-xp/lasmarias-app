@@ -28,6 +28,7 @@ export const generateRefreshToken = (uid, res) => {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: !(process.env.MODO === 'developer'),
+      sameSite: process.env.MODO === 'developer' ? 'Lax' : 'None',
       expires: new Date(Date.now() + (60 * 60 * 24 * 30 * 1000))
     })
   } catch (error) {
