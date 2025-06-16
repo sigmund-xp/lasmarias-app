@@ -14,24 +14,12 @@ import farrierRouter from './routes/farrier.route.js'
 const app = express()
 
 const corsOptions = {
-  origin: [process.env.ORIGIN1],
+  origin: [process.env.ORIGIN1, process.env.ORIGIN2],
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
   credentials: true
 }
 
-if (process.env.MODO === 'developer') {
-  app.use(cors({
-    origin: [
-      process.env.ORIGIN1,
-      'http://192.168.1.63:8080'
-    ],
-    methods: ['GET', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
-    credentials: true
-  }))
-} else {
-  app.use(cors(corsOptions))
-}
-
+app.use(cors(corsOptions))
 app.use(express.static('public'))
 app.use(express.json())
 app.use(cookieParser())
